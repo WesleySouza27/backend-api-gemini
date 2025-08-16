@@ -11,6 +11,11 @@ export class MessageService {
   ) {}
 
   async create(content: string, userId: string, isBot = false) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new Error('Usuário não encontrado');
+    }
+
     return this.prisma.message.create({
       data: {
         content,
@@ -32,10 +37,12 @@ export class MessageService {
     const url =
       'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent';
 
+    const markdownPrompt = `${prompt}\n\nResponda usando Markdown.`;
+
     const payload = {
       contents: [
         {
-          parts: [{ text: prompt }],
+          parts: [{ text: markdownPrompt }],
         },
       ],
     };
