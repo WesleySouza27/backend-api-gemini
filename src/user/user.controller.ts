@@ -68,6 +68,10 @@ export class UserController {
     if (!user) {
       throw new UnauthorizedException('Usuário ou senha inválidos.');
     }
-    return { message: 'Login realizado com sucesso', userId: user.id };
+    return {
+      message: 'Login realizado com sucesso',
+      userId: user.id,
+      username: user.username,
+    };
   }
 }
