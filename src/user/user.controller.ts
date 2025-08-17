@@ -10,12 +10,19 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { AuthService } from '../auth/auth.service';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+  ) {}
 
   @ApiProperty({ type: [CreateUserDto] })
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getUsers() {
     const users = await this.userService.findAll();
@@ -25,6 +32,7 @@ export class UserController {
     return users;
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @ApiProperty({ example: 'user-id-123', description: 'ID do usuário' })
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
@@ -68,10 +76,6 @@ export class UserController {
     if (!user) {
       throw new UnauthorizedException('Usuário ou senha inválidos.');
     }
-    return {
-      message: 'Login realizado com sucesso',
-      userId: user.id,
-      username: user.username,
-    };
+    return this.authService.login(user);
   }
 }
