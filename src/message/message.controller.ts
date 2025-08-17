@@ -9,18 +9,20 @@ import {
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('message')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post()
   async sendMessage(@Body() createMessageDto: CreateMessageDto) {
     if (!createMessageDto.content || !createMessageDto.userId) {
       throw new BadRequestException('Conteúdo e userId são obrigatórios.');
     }
 
-    // Verifica se o usuário existe antes de criar a mensagem
     const userExists = await this.messageService['prisma'].user.findUnique({
       where: { id: createMessageDto.userId },
     });
@@ -45,13 +47,13 @@ export class MessageController {
     return { userMessage, botMessage };
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Get()
   async getMessages(@Query('userId') userId: string) {
     if (!userId) {
       throw new BadRequestException('userId é obrigatório.');
     }
 
-    // Verifica se o usuário existe antes de buscar mensagens
     const userExists = await this.messageService['prisma'].user.findUnique({
       where: { id: userId },
     });
