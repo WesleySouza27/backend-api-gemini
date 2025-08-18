@@ -143,7 +143,7 @@ Substitua `<SEU_JWT_AQUI>` e `<USER_ID>` pelos valores retornados pelas rotas de
 - class-validator / class-transformer
 - Swagger (documentação)
 
-- Author - [Wesley Souza](https://twitter.com/kammysliwiec)
+- Author - [Wesley Souza](https://www.linkedin.com/in/wesley-souza-/)
 
 ## License
 
