@@ -145,7 +145,7 @@ Substitua `<SEU_JWT_AQUI>` e `<USER_ID>` pelos valores retornados pelas rotas de
 
 - Author - [Wesley Souza](https://www.linkedin.com/in/wesley-souza-/)
 
-- deploy - [api](https://backend-api-gemini.onrender.com)
+- deploy - [api](https://backend-api-gemini.onrender.com/api)
 
 ## License
 
