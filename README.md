@@ -145,6 +145,8 @@ Substitua `<SEU_JWT_AQUI>` e `<USER_ID>` pelos valores retornados pelas rotas de
 
 - Author - [Wesley Souza](https://www.linkedin.com/in/wesley-souza-/)
 
+- deploy api [](https://backend-api-gemini.onrender.com)
+
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
