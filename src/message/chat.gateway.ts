@@ -25,14 +25,22 @@ export class ChatGateway {
     @MessageBody() data: { content: string; userId: string },
     @ConnectedSocket() client: Socket,
   ) {
-    // Salva a mensagem do usuário (opcional)
-    await this.messageService.create(data.content, data.userId, false);
+    // Salva a mensagem do usuário
+    await this.messageService.create({
+      content: data.content,
+      userId: data.userId,
+      isBot: false,
+    });
 
     // Gera resposta do bot
     const botReply = await this.messageService.askGemini(data.content);
 
-    // Salva resposta do bot (opcional)
-    await this.messageService.create(botReply, data.userId, true);
+    // Salva resposta do bot
+    await this.messageService.create({
+      content: botReply,
+      userId: data.userId,
+      isBot: true,
+    });
 
     // Envia resposta só para o remetente
     client.emit('receive_message', {

@@ -19,54 +19,32 @@ export class MessageController {
   @UseGuards(AuthGuard('jwt'))
   @Post()
   async sendMessage(@Body() createMessageDto: CreateMessageDto) {
-    if (!createMessageDto.content || !createMessageDto.userId) {
-      throw new BadRequestException('Conteúdo e userId são obrigatórios.');
+    try {
+      return await this.messageService.sendUserAndBotMessage(createMessageDto);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message.includes('obrigatório')) {
+        throw new BadRequestException(err.message);
+      }
+      if (err instanceof Error) {
+        throw new NotFoundException(err.message);
+      }
+      throw err;
     }
-
-    const userExists = await this.messageService['prisma'].user.findUnique({
-      where: { id: createMessageDto.userId },
-    });
-    if (!userExists) {
-      throw new NotFoundException('Usuário não encontrado.');
-    }
-
-    const userMessage = await this.messageService.create(
-      createMessageDto.content,
-      createMessageDto.userId,
-      false,
-    );
-    const botReply = await this.messageService.askGemini(
-      createMessageDto.content,
-    );
-    const botMessage = await this.messageService.create(
-      botReply,
-      createMessageDto.userId,
-      true,
-    );
-
-    return { userMessage, botMessage };
   }
 
   @UseGuards(AuthGuard('jwt'))
   @Get()
   async getMessages(@Query('userId') userId: string) {
-    if (!userId) {
-      throw new BadRequestException('userId é obrigatório.');
+    try {
+      return await this.messageService.getUserMessages(userId);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message.includes('obrigatório')) {
+        throw new BadRequestException(err.message);
+      }
+      if (err instanceof Error) {
+        throw new NotFoundException(err.message);
+      }
+      throw err;
     }
-
-    const userExists = await this.messageService['prisma'].user.findUnique({
-      where: { id: userId },
-    });
-    if (!userExists) {
-      throw new NotFoundException('Usuário não encontrado.');
-    }
-
-    const messages = await this.messageService.findByUser(userId);
-    if (!messages || messages.length === 0) {
-      throw new NotFoundException(
-        'Nenhuma mensagem encontrada para este usuário.',
-      );
-    }
-    return messages;
   }
 }

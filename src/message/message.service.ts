@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { CreateMessageDto } from './dto/create-message.dto';
 
 @Injectable()
 export class MessageService {
@@ -10,7 +11,8 @@ export class MessageService {
     private httpService: HttpService,
   ) {}
 
-  async create(content: string, userId: string, isBot = false) {
+  async create(dto: CreateMessageDto) {
+    const { content, userId, isBot = false } = dto;
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
       throw new Error('Usuário não encontrado');
@@ -73,5 +75,58 @@ export class MessageService {
       response.data.candidates[0].content.parts[0].text;
 
     return text || 'Erro ao obter resposta da IA';
+  }
+
+  async sendUserAndBotMessage(
+    dto: CreateMessageDto,
+  ): Promise<{ userMessage: any; botMessage: any }> {
+    if (!dto.content || !dto.userId) {
+      throw new Error('Conteúdo e userId são obrigatórios');
+    }
+
+    // Verifica se o usuário existe
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: dto.userId },
+    });
+    if (!userExists) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    // Cria a mensagem do usuário
+    const userMessage = await this.create({
+      ...dto,
+      isBot: false,
+    });
+
+    // Gera resposta do bot
+    const botContent = await this.askGemini(dto.content);
+
+    // Cria a mensagem do bot
+    const botMessage = await this.create({
+      content: botContent,
+      userId: dto.userId,
+      isBot: true,
+    });
+
+    return { userMessage, botMessage };
+  }
+
+  async getUserMessages(userId: string) {
+    if (!userId) {
+      throw new Error('userId é obrigatório');
+    }
+
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!userExists) {
+      throw new Error('Usuário não encontrado');
+    }
+
+    const messages = await this.findByUser(userId);
+    if (!messages.length) {
+      throw new Error('Nenhuma mensagem encontrada');
+    }
+    return messages;
   }
 }

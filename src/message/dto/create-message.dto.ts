@@ -8,9 +8,11 @@ export class CreateMessageDto {
   content: string;
 
   @ApiProperty({
-    example: 'id-123',
+    example: 'id do usuário(uuid)',
     description: 'ID do usuário autor da mensagem',
   })
   @IsString()
   userId: string;
+
+  isBot?: boolean;
 }
