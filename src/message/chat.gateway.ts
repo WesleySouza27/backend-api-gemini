@@ -11,6 +11,8 @@ import { MessageService } from './message.service';
 @WebSocketGateway({
   cors: {
     origin: '*',
+    methods: ['GET', 'POST'],
+    credentials: true,
   },
 })
 export class ChatGateway {
