@@ -32,7 +32,6 @@ export class UserController {
     return users;
   }
 
-  @UseGuards(AuthGuard('jwt'))
   @ApiProperty({ example: 'user-id-123', description: 'ID do usuário' })
   @Get(':userId')
   async getUser(@Param('userId') userId: string) {
