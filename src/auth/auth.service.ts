@@ -18,9 +18,9 @@ export class AuthService {
     username: string,
     password: string,
   ): Promise<AuthUser | null> {
-    const user = await this.userService.validateUser(username, password);
+    const user = await this.userService.validateUser({ username, password });
     if (!user) throw new UnauthorizedException('Usuário ou senha inválidos.');
-    return { id: user.id, username: user.username };
+    return { id: user.userId, username: user.username };
   }
 
   login(user: AuthUser) {
