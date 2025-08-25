@@ -25,11 +25,13 @@ export class UserController {
 
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    const user = await this.userService.create(createUserDto);
+    return { userId: user.id, username: user.username };
   }
 
   @Post('login')
-  async login(@Body() createUserDto: CreateUserDto) {
-    return this.userService.validateUser(createUserDto);
+  async login(@Body() body: { username: string; password: string }) {
+    const { userId, username } = await this.userService.validateUser(body);
+    return this.authService.login({ id: userId, username });
   }
 }
